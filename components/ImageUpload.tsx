@@ -106,12 +106,12 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
   return (
     <div>
       <div
-        className={`border-2 border-dashed rounded-lg p-6 text-center ${isDragging
+        className={`border-2 border-dashed rounded-lg p-2 ${isDragging
           ? "border-indigo-500 bg-indigo-50 dark:bg-blue-900/20"
           : error
             ? "border-red-500 bg-red-50"
             : "border-gray-300 dark:border-gray-700"
-          } transition-colors cursor-pointer`}
+          } transition-colors cursor-pointer flex flex-row items-center justify-center gap-4 min-h-[60px]`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -125,10 +125,10 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
           ref={fileInputRef}
           className="hidden"
         />
-        <div className="flex flex-col items-center">
+
+        <div className="flex-shrink-0">
           <svg
-            className={`w-12 h-12 mb-3 ${error ? "text-red-400" : "text-gray-400"
-              }`}
+            className={`w-6 h-6 ${error ? "text-red-400" : "text-gray-400"}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -141,26 +141,26 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
             />
           </svg>
-          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-semibold">Click to upload</span> or drag and
-            drop
-          </p>
+        </div>
+
+        <div className="flex flex-col text-left">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            PNG or JPEG files only
+            <span className="font-semibold text-indigo-600">Click to upload</span> or drag and drop
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-0">
-            Required dimensions: {currentDimensions.width} ×{" "}
-            {currentDimensions.height} pixels for {currentDeviceName}.
+          <p className="text-[10px] text-gray-400 leading-tight">
+            PNG or JPEG • {currentDimensions.width}×{currentDimensions.height}px
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Take screenshots from real device or simulator.
-          </p>
+          {!file && (
+            <p className="text-[10px] text-gray-400 leading-tight">
+              For {currentDeviceName}
+            </p>
+          )}
           {file && !error && (
-            <p className="mt-2 text-sm text-green-500">Selected: {file.name}</p>
+            <p className="text-xs text-green-600 font-medium mt-1">Selected: {file.name}</p>
           )}
         </div>
       </div>
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-500 text-center">{error}</p>}
     </div>
   );
 };

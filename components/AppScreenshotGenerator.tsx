@@ -400,10 +400,11 @@ function AppScreenshotGeneratorContent() {
       {/* Add custom slider styles */}
       <style dangerouslySetInnerHTML={{ __html: sliderStyles }} />
 
-      {/* Device Selection */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-        <h2 className="text-lg font-medium mb-4">Choose Device</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Top Section: Device & Marketing */}
+      <div className="flex flex-col lg:flex-row gap-8 mb-6 max-w-7xl mx-auto">
+        {/* Device Selection (1/3) */}
+        <div className="lg:w-1/3 bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-base font-medium mb-1">Choose Device</h2>
           <div className="relative">
             <label
               htmlFor="deviceType"
@@ -515,51 +516,62 @@ function AppScreenshotGeneratorContent() {
             </div>
           </div>
         </div>
+
+        {/* Upload Image (2/3) */}
+        <div className="lg:w-2/3 bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-base font-medium mb-1">Upload Image</h2>
+          <ImageUpload
+            key={deviceType}
+            deviceType={deviceType}
+            onImageUpload={handleImageUpload}
+          />
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
         {/* Configuration Column */}
         <div className="lg:w-2/3 flex flex-col space-y-6">
+
+
           {/* Marketing Message */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
             <label
               htmlFor="marketingMessage"
-              className="block labelAsHeading text-lg font-medium mb-4"
+              className="block labelAsHeading text-base font-medium mb-2"
             >
               Marketing Message
             </label>
-            <textarea
-              id="marketingMessage"
-              placeholder="Enter your app's marketing message"
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-secondary"
-              value={marketingMessage}
-              onChange={(e) => setMarketingMessage(e.target.value)}
-            />
-            <div className="mt-4 flex justify-end">
+            <div className="flex gap-2">
+              <textarea
+                id="marketingMessage"
+                placeholder="Enter your app's marketing message"
+                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-secondary h-16"
+                value={marketingMessage}
+                onChange={(e) => setMarketingMessage(e.target.value)}
+              />
               <button
                 onClick={handleGeneratePreview}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                className="px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors flex items-center justify-center flex-shrink-0"
                 title="Update the preview with your latest changes"
               >
-                Apply Changes
+                Apply
               </button>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="text-lg font-medium mb-4">Upload Image</h2>
-            <ImageUpload
-              key={deviceType}
-              deviceType={deviceType}
-              onImageUpload={handleImageUpload}
-            />
-          </div>
-
           {/* Text Styling Options */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="text-lg font-medium mb-4">Text Styling</h2>
+          <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-base font-medium">Text Styling</h2>
+              <button
+                onClick={handleGeneratePreview}
+                className="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              >
+                Apply
+              </button>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
               <div>
                 <label htmlFor="fontFamily" className="block text-sm mb-1">
                   Font Family
@@ -583,7 +595,7 @@ function AppScreenshotGeneratorContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-1">
               <div>
                 <label htmlFor="fontWeight" className="block text-sm mb-1">
                   Font Weight
@@ -673,24 +685,22 @@ function AppScreenshotGeneratorContent() {
                 </div>
               </div>
             </div>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={handleGeneratePreview}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
-                title="Update the preview with your latest changes"
-              >
-                Apply Changes
-              </button>
-            </div>
+            {/* Removed Apply Changes button here as we moved it to title */}
           </div>
 
           {/* Device Settings */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="text-lg font-medium mb-4">
-              Device Positioning & Appearance
-            </h2>
+          <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-base font-medium">Device Positioning</h2>
+              <button
+                onClick={handleGeneratePreview}
+                className="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              >
+                Apply
+              </button>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
               <div>
                 <label
                   htmlFor="bezelTopDistance"
@@ -830,15 +840,7 @@ function AppScreenshotGeneratorContent() {
                 className="w-full custom-slider"
               />
             </div>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={handleGeneratePreview}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
-                title="Update the preview with your latest changes"
-              >
-                Apply Changes
-              </button>
-            </div>
+            {/* Button removed (moved to header) */}
           </div>
         </div>
 
