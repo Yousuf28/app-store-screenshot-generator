@@ -11,6 +11,7 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [wasResized, setWasResized] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
@@ -51,6 +52,7 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
   const handleFile = (file: File) => {
     // Reset error state
     setError(null);
+    setWasResized(false);
 
     // Check if file is a PNG or JPEG
     if (file.type !== "image/png" && file.type !== "image/jpeg") {
@@ -73,11 +75,28 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
           img.width !== expectedDimensions.width ||
           img.height !== expectedDimensions.height
         ) {
-          setError(
-            `Image dimensions must be ${expectedDimensions.width} × ${expectedDimensions.height
-            } pixels for ${deviceNames[deviceType as keyof typeof deviceNames]}`
-          );
-          return;
+          // Auto-resize logic using canvas
+          const canvas = document.createElement("canvas");
+          canvas.width = expectedDimensions.width;
+          canvas.height = expectedDimensions.height;
+          const ctx = canvas.getContext("2d");
+
+          if (ctx) {
+            // Draw and resize image to fit exactly
+            ctx.drawImage(
+              img,
+              0,
+              0,
+              expectedDimensions.width,
+              expectedDimensions.height
+            );
+            const resizedDataUrl = canvas.toDataURL("image/png");
+
+            setFile(file); // Keep original file name
+            setWasResized(true);
+            onImageUpload(resizedDataUrl);
+            return;
+          }
         }
 
         // Image is valid, pass to parent
@@ -156,7 +175,14 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
             </p>
           )}
           {file && !error && (
-            <p className="text-xs text-green-600 font-medium mt-1">Selected: {file.name}</p>
+            <div className="mt-1">
+              <p className="text-xs text-green-600 font-medium">Selected: {file.name}</p>
+              {wasResized && (
+                <p className="text-[10px] text-amber-600 font-medium">
+                  (Auto-resized to fit)
+                </p>
+              )}
+            </div>
           )}
         </div>
       </div>
