@@ -18,7 +18,7 @@ import {
   deviceDimensions,
 } from "@/lib/constants";
 import { defaultImage } from "@/lib/deafultImage";
-import { logEvent } from "@/lib/firebase";
+
 
 const sliderStyles = `
   .custom-slider {
@@ -132,11 +132,7 @@ function AppScreenshotGeneratorContent() {
 
   const [fontLoaded, setFontLoaded] = useState(false);
 
-  useEffect(() => {
-    logEvent("page_view", {
-      page_title: "App Screenshot Generator Homepage",
-    });
-  }, []);
+
 
   // Add beforeunload event listener to prompt user before leaving the page
   useEffect(() => {

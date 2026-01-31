@@ -1,30 +1,37 @@
 ## App Store Screenshot Generator
 
-Created a simple screenshot generator for App Store and Google Play Store as a React app with Next.js. Almost all code for the initial version was generated with Cursor + Claude 3.7 Sonnet Thinking. PRs and feature requests are welcome.
+A simple, fast, and privacy-focused screenshot generator for App Store and Google Play Store. Built with React, Next.js, and Tailwind CSS.
 
-You can also use the tool directly from:
-[storesnaps.com](https://www.storesnaps.com)
+**Live Demo:** [https://yousuf28.github.io/app-store-screenshot-generator/](https://yousuf28.github.io/app-store-screenshot-generator/)
 
-## Getting Started
+### Features
+*   **100% Client-Side:** No images are uploaded to any server. Everything happens in your browser.
+*   **Privacy First:** Zero tracking, zero data collection.
+*   **Auto-Resizing:** Upload any image, and it automatically fits the selected device.
+*   **Customizable:** Adjust backgrounds, fonts, bezels, and more.
 
-`npm install`
+### Getting Started
 
-Copy .env.example to .env.local
+Prerequisites: Node.js 18+
 
 ```bash
+# Install dependencies
+npm install
+
+# Run locally
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-## TODO:
+### Deployment
 
-- [ ] Real device bezels for some models
-- [ ] Background image
-- [ ] Gradient backgrounds
+This project is configured for **GitHub Pages**.
+
+1.  Push changes to the `main` branch.
+2.  The included GitHub Action (`.github/workflows/deploy.yml`) will automatically build and deploy the app to the `gh-pages` branch.
+3.  Access your site at `https://<your-username>.github.io/<repo-name>/`.
+
+### License
+
+MIT © [Yousuf Ali](https://github.com/Yousuf28)
