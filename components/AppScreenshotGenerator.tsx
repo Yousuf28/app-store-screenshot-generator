@@ -1,5 +1,7 @@
 "use client";
 
+
+
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import ImageUpload from "@/components/ImageUpload";
@@ -97,6 +99,8 @@ const sliderStyles = `
     color: transparent;
   }
 `;
+const FONTS_TO_LOAD = ["Inter", "DM Sans", "Outfit", "JetBrains Mono"];
+
 export default function AppScreenshotGenerator() {
   return (
     <Suspense
@@ -184,19 +188,19 @@ function AppScreenshotGeneratorContent() {
   const [textTopDistance, setTextTopDistance] = useState(
     parseInt(
       searchParams.get("textTopDistance") ||
-        String(defaultConfig.textTopDistance)
+      String(defaultConfig.textTopDistance)
     )
   );
   const [bezelTopDistance, setBezelTopDistance] = useState(
     parseInt(
       searchParams.get("bezelTopDistance") ||
-        String(defaultConfig.bezelTopDistance)
+      String(defaultConfig.bezelTopDistance)
     )
   );
   const [deviceSizeFactor, setDeviceSizeFactor] = useState(
     parseFloat(
       searchParams.get("deviceSizeFactor") ||
-        String(defaultConfig.deviceSizeFactor)
+      String(defaultConfig.deviceSizeFactor)
     )
   );
   const [borderRadius, setBorderRadius] = useState<number>(
@@ -273,7 +277,7 @@ function AppScreenshotGeneratorContent() {
     }
   }, [searchParams]);
 
-  useFontLoader(["Inter", "DM Sans", "Outfit", "JetBrains Mono"]);
+  useFontLoader(FONTS_TO_LOAD);
 
   useEffect(() => {
     if (fontFamily) {
@@ -325,22 +329,71 @@ function AppScreenshotGeneratorContent() {
     window.history.replaceState({}, "", newUrl);
   };
 
-  useEffect(() => {
+  // State to hold the configuration that is currently being applied to the preview
+  // This separates the input state (fast) from the render state (slow)
+  const [generatedConfig, setGeneratedConfig] = useState({
+    marketingMessage: "Best app ever!",
+    deviceType: urlDeviceType,
+    textColor:
+      searchParams.get("textColor") ||
+      defaultConfigs[urlDeviceType].textColor,
+    backgroundColor:
+      searchParams.get("backgroundColor") ||
+      defaultConfigs[urlDeviceType].backgroundColor,
+    bezelWidth: parseFloat(
+      searchParams.get("bezelWidth") ||
+      String(defaultConfigs[urlDeviceType].bezelWidth)
+    ),
+    bezelColor:
+      searchParams.get("bezelColor") ||
+      defaultConfigs[urlDeviceType].bezelColor,
+    fontFamily:
+      searchParams.get("fontFamily") ||
+      defaultConfigs[urlDeviceType].fontFamily,
+    fontSize: parseFloat(
+      searchParams.get("fontSize") ||
+      String(defaultConfigs[urlDeviceType].fontSize)
+    ),
+    fontWeight: searchParams.get("fontWeight")
+      ? searchParams.get("fontWeight")!
+      : String(defaultConfigs[urlDeviceType].fontWeight),
+    textTopDistance: parseInt(
+      searchParams.get("textTopDistance") ||
+      String(defaultConfigs[urlDeviceType].textTopDistance)
+    ),
+    bezelTopDistance: parseInt(
+      searchParams.get("bezelTopDistance") ||
+      String(defaultConfigs[urlDeviceType].bezelTopDistance)
+    ),
+    deviceSizeFactor: parseFloat(
+      searchParams.get("deviceSizeFactor") ||
+      String(defaultConfigs[urlDeviceType].deviceSizeFactor)
+    ),
+    borderRadius: parseInt(
+      searchParams.get("borderRadius") ||
+      String(defaultConfigs[urlDeviceType].borderRadius)
+    ),
+  });
+
+  const handleGeneratePreview = () => {
+    setGeneratedConfig({
+      marketingMessage,
+      deviceType,
+      textColor,
+      backgroundColor,
+      bezelWidth,
+      bezelColor,
+      fontFamily,
+      fontSize,
+      fontWeight,
+      textTopDistance,
+      bezelTopDistance,
+      deviceSizeFactor,
+      borderRadius,
+    });
+    // Also update URL when generating
     updateUrlWithConfig();
-  }, [
-    deviceType,
-    textColor,
-    backgroundColor,
-    bezelWidth,
-    bezelColor,
-    fontFamily,
-    fontSize,
-    fontWeight,
-    textTopDistance,
-    bezelTopDistance,
-    deviceSizeFactor,
-    borderRadius,
-  ]);
+  };
 
   return (
     <>
@@ -390,11 +443,10 @@ function AppScreenshotGeneratorContent() {
                       {deviceDisplaySizes[
                         key as keyof typeof deviceDisplaySizes
                       ]
-                        ? ` (${
-                            deviceDisplaySizes[
-                              key as keyof typeof deviceDisplaySizes
-                            ]
-                          })`
+                        ? ` (${deviceDisplaySizes[
+                        key as keyof typeof deviceDisplaySizes
+                        ]
+                        })`
                         : ""}
                     </option>
                   ))}
@@ -406,11 +458,10 @@ function AppScreenshotGeneratorContent() {
                       {deviceDisplaySizes[
                         key as keyof typeof deviceDisplaySizes
                       ]
-                        ? ` (${
-                            deviceDisplaySizes[
-                              key as keyof typeof deviceDisplaySizes
-                            ]
-                          })`
+                        ? ` (${deviceDisplaySizes[
+                        key as keyof typeof deviceDisplaySizes
+                        ]
+                        })`
                         : ""}
                     </option>
                   ))}
@@ -422,11 +473,10 @@ function AppScreenshotGeneratorContent() {
                       {deviceDisplaySizes[
                         key as keyof typeof deviceDisplaySizes
                       ]
-                        ? ` (${
-                            deviceDisplaySizes[
-                              key as keyof typeof deviceDisplaySizes
-                            ]
-                          })`
+                        ? ` (${deviceDisplaySizes[
+                        key as keyof typeof deviceDisplaySizes
+                        ]
+                        })`
                         : ""}
                     </option>
                   ))}
@@ -438,11 +488,10 @@ function AppScreenshotGeneratorContent() {
                       {deviceDisplaySizes[
                         key as keyof typeof deviceDisplaySizes
                       ]
-                        ? ` (${
-                            deviceDisplaySizes[
-                              key as keyof typeof deviceDisplaySizes
-                            ]
-                          })`
+                        ? ` (${deviceDisplaySizes[
+                        key as keyof typeof deviceDisplaySizes
+                        ]
+                        })`
                         : ""}
                     </option>
                   ))}
@@ -486,6 +535,15 @@ function AppScreenshotGeneratorContent() {
               value={marketingMessage}
               onChange={(e) => setMarketingMessage(e.target.value)}
             />
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={handleGeneratePreview}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                title="Update the preview with your latest changes"
+              >
+                Apply Changes
+              </button>
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
@@ -614,6 +672,15 @@ function AppScreenshotGeneratorContent() {
                   />
                 </div>
               </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={handleGeneratePreview}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                title="Update the preview with your latest changes"
+              >
+                Apply Changes
+              </button>
             </div>
           </div>
 
@@ -763,6 +830,15 @@ function AppScreenshotGeneratorContent() {
                 className="w-full custom-slider"
               />
             </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={handleGeneratePreview}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                title="Update the preview with your latest changes"
+              >
+                Apply Changes
+              </button>
+            </div>
           </div>
         </div>
 
@@ -773,22 +849,22 @@ function AppScreenshotGeneratorContent() {
 
             {uploadedImage ? (
               <ScreenshotGenerator
-                key={deviceType}
+                key={generatedConfig.deviceType}
                 fontLoaded={fontLoaded}
                 screenshotImage={uploadedImage}
-                marketingMessage={marketingMessage}
-                deviceType={deviceType}
-                textColor={textColor}
-                backgroundColor={backgroundColor}
-                bezelWidth={bezelWidth}
-                bezelColor={bezelColor}
-                fontFamily={fontFamily}
-                fontSize={fontSize}
-                fontWeight={fontWeight}
-                textTopDistance={textTopDistance}
-                bezelTopDistance={bezelTopDistance}
-                deviceSizeFactor={deviceSizeFactor}
-                borderRadius={borderRadius}
+                marketingMessage={generatedConfig.marketingMessage}
+                deviceType={generatedConfig.deviceType}
+                textColor={generatedConfig.textColor}
+                backgroundColor={generatedConfig.backgroundColor}
+                bezelWidth={generatedConfig.bezelWidth}
+                bezelColor={generatedConfig.bezelColor}
+                fontFamily={generatedConfig.fontFamily}
+                fontSize={generatedConfig.fontSize}
+                fontWeight={generatedConfig.fontWeight}
+                textTopDistance={generatedConfig.textTopDistance}
+                bezelTopDistance={generatedConfig.bezelTopDistance}
+                deviceSizeFactor={generatedConfig.deviceSizeFactor}
+                borderRadius={generatedConfig.borderRadius}
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-96 bg-gray-50 rounded-lg border border-gray-200">
@@ -796,8 +872,8 @@ function AppScreenshotGeneratorContent() {
                   {!uploadedImage && !marketingMessage
                     ? "Upload an image and add a marketing message to see the preview"
                     : !uploadedImage
-                    ? "Upload an image to see the preview"
-                    : "Add a marketing message to see the preview"}
+                      ? "Upload an image to see the preview"
+                      : "Add a marketing message to see the preview"}
                 </p>
               </div>
             )}

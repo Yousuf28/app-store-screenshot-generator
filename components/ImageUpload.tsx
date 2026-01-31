@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, ChangeEvent, DragEvent } from "react";
+import { useState, useRef, ChangeEvent, DragEvent, memo } from "react";
 import { deviceDimensions, deviceNames } from "@/lib/constants";
 
 interface ImageUploadProps {
@@ -74,8 +74,7 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
           img.height !== expectedDimensions.height
         ) {
           setError(
-            `Image dimensions must be ${expectedDimensions.width} × ${
-              expectedDimensions.height
+            `Image dimensions must be ${expectedDimensions.width} × ${expectedDimensions.height
             } pixels for ${deviceNames[deviceType as keyof typeof deviceNames]}`
           );
           return;
@@ -107,13 +106,12 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
   return (
     <div>
       <div
-        className={`border-2 border-dashed rounded-lg p-6 text-center ${
-          isDragging
-            ? "border-indigo-500 bg-indigo-50 dark:bg-blue-900/20"
-            : error
+        className={`border-2 border-dashed rounded-lg p-6 text-center ${isDragging
+          ? "border-indigo-500 bg-indigo-50 dark:bg-blue-900/20"
+          : error
             ? "border-red-500 bg-red-50"
             : "border-gray-300 dark:border-gray-700"
-        } transition-colors cursor-pointer`}
+          } transition-colors cursor-pointer`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -129,9 +127,8 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
         />
         <div className="flex flex-col items-center">
           <svg
-            className={`w-12 h-12 mb-3 ${
-              error ? "text-red-400" : "text-gray-400"
-            }`}
+            className={`w-12 h-12 mb-3 ${error ? "text-red-400" : "text-gray-400"
+              }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -168,4 +165,4 @@ const ImageUpload = ({ deviceType, onImageUpload }: ImageUploadProps) => {
   );
 };
 
-export default ImageUpload;
+export default memo(ImageUpload);

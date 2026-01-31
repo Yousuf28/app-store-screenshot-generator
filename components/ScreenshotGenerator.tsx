@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, memo } from "react";
 import { canvasDimensions, deviceNames } from "@/lib/constants";
 
 interface ScreenshotGeneratorProps {
@@ -352,4 +352,4 @@ const ScreenshotGenerator = ({
   );
 };
 
-export default ScreenshotGenerator;
+export default memo(ScreenshotGenerator);

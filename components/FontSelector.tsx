@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { loadFont } from "@/lib/useFontLoader";
 
 interface FontSelectorProps {
@@ -129,43 +129,54 @@ const FontSelector = ({ value, onChange }: FontSelectorProps) => {
     }
   };
 
+  // Track which fonts are currently being loaded to prevent duplicates
+  const loadingFontsRef = useRef<Set<string>>(new Set());
+
   // Load a font for preview
-  const loadFontForPreview = (fontFamily: string) => {
-    if (loadedFonts.includes(fontFamily)) return;
-
-    try {
-      // @ts-ignore - WebFontLoader types might not be properly defined
-      window.WebFontConfig = {
-        google: {
-          families: [`${fontFamily}:${FONT_WEIGHTS_TO_LOAD}`],
-        },
-        active: () => {
-          setLoadedFonts((prev) => [...prev, fontFamily]);
-        },
-      };
-
-      // Create and append the webfont script
-      const wf = document.createElement("script");
-      wf.src = `https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js`;
-      wf.async = true;
-      document.head.appendChild(wf);
-    } catch (error) {
-      console.error(`Failed to load font: ${fontFamily}`, error);
-    }
-  };
-
-  // Replace the existing loadFont function calls with loadFontForPreview
   const handlePreviewFont = (fontFamily: string) => {
-    loadFont(fontFamily, () => setLoadedFonts((prev) => [...prev, fontFamily]));
+    // Prevent duplicate requests if already loaded or currently loading
+    if (loadedFonts.includes(fontFamily) || loadingFontsRef.current.has(fontFamily)) {
+      return;
+    }
+
+    // Mark as loading
+    loadingFontsRef.current.add(fontFamily);
+
+    loadFont(fontFamily, () => {
+      setLoadedFonts((prev) => [...prev, fontFamily]);
+      // Remove from loading set
+      loadingFontsRef.current.delete(fontFamily);
+    });
   };
 
-  const handleSelectFont = (fontFamily: string) => {
-    // Ensure font is loaded with all weights
-    loadFont(fontFamily, () => setLoadedFonts((prev) => [...prev, fontFamily]));
-    // Update the selected font
-    onChange(`${fontFamily}, sans-serif`);
-    // Close the modal
-    setIsModalOpen(false);
+  // Temporary selection state for the modal
+  const [tempSelection, setTempSelection] = useState("");
+
+  // Update temp selection when modal opens
+  useEffect(() => {
+    if (isModalOpen) {
+      // Extract the simple font name from the current value
+      const currentFont = value.split(",")[0].replace(/['"]/g, "").trim();
+      setTempSelection(currentFont);
+    }
+  }, [isModalOpen, value]);
+
+  const handleFontClick = (fontFamily: string) => {
+    // Just update the visual selection, don't close modal yet
+    setTempSelection(fontFamily);
+    // Ensure it's loaded for preview
+    handlePreviewFont(fontFamily);
+  };
+
+  const handleConfirmSelection = () => {
+    if (tempSelection) {
+      // Ensure font is loaded with all weights before applying
+      loadFont(tempSelection, () => setLoadedFonts((prev) => [...prev, tempSelection]));
+      // Update the parent state
+      onChange(`${tempSelection}, sans-serif`);
+      // Close the modal
+      setIsModalOpen(false);
+    }
   };
 
   // Determine which fonts to display
@@ -251,11 +262,15 @@ const FontSelector = ({ value, onChange }: FontSelectorProps) => {
                   {displayFonts.map((font) => {
                     // Load font for preview when it comes into view
                     handlePreviewFont(font.family);
+                    const isSelected = tempSelection === font.family;
                     return (
                       <button
                         key={font.family}
-                        className="p-3 border border-gray-200 rounded-lg text-left hover:border-indigo-300 hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        onClick={() => handleSelectFont(font.family)}
+                        className={`p-3 border rounded-lg text-left transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isSelected
+                          ? "border-indigo-600 bg-indigo-50 ring-2 ring-indigo-500"
+                          : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"
+                          }`}
+                        onClick={() => handleFontClick(font.family)}
                         onMouseEnter={() => handlePreviewFont(font.family)}
                         style={{
                           fontFamily: loadedFonts.includes(font.family)
@@ -281,15 +296,27 @@ const FontSelector = ({ value, onChange }: FontSelectorProps) => {
               )}
             </div>
 
-            <div className="p-4 border-t flex justify-end">
+            <div className="p-4 border-t flex justify-end items-center gap-3">
+              <div className="text-sm text-gray-500 mr-auto">
+                {tempSelection ? `Selected: ${tempSelection}` : "Select a font"}
+              </div>
               <button
                 type="button"
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md mr-2 font-medium transition-colors"
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md font-medium transition-colors"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
               </button>
+              <button
+                type="button"
+                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleConfirmSelection}
+                disabled={!tempSelection}
+              >
+                Select This Font
+              </button>
             </div>
+
           </div>
         </div>
       )}
@@ -297,4 +324,4 @@ const FontSelector = ({ value, onChange }: FontSelectorProps) => {
   );
 };
 
-export default FontSelector;
+export default memo(FontSelector);
